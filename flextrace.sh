@@ -117,3 +117,26 @@ function loop()
 }
 
 # Command
+if [ -f "$pidFile" ]; then
+  oldPid=$(cat $pidFile)
+fi
+check_daemon
+case "$1" in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  status)
+    status
+    ;;
+  restart)
+    restart
+    ;;
+  *)
+  echo "\033[31;5;148mError\033[39m: usage $0 { start | stop | restart | status }"
+  exit 1
+esac
+
+exit 0
