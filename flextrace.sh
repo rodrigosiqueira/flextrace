@@ -1,11 +1,15 @@
 #!/bin/sh
 
-daemonName="flextrace"
+REDCOLOR="\033[1;31;49m%s\033[m\n"
+GREENCOLOR="\033[1;32;49m%s\033[m\n"
+PURPLECOLOR="\033[1;35;49m%s\033[m\n"
 
-pidDir="."
+daemonName='flextrace'
+
+pidDir='.'
 pidFile="$pidDir/$daemonName.pid"
 
-logDir="."
+logDir='.'
 logFile="$logDir/$daemonName.log"
 
 # Log maxsize in KB
@@ -13,7 +17,7 @@ logMaxSize=1024 # 1mb
 
 runInterval=60 # In seconds
 
-function doCommands()
+function trace_application()
 {
   # This is where you put all the commands for the daemon
   echo 'Running commands'
@@ -27,13 +31,13 @@ function setup()
   if [ ! -d "$pidDir" ]; then
     mkdir "$pidDir"
   fi
-  if [ ! -d "$pidDir" ]; then
+  if [ ! -d "$logDir" ]; then
     mkdir "$logDir"
   fi
   if [ ! -f "$logFile" ]; then
     touch "$logFile"
   else
-    size=$(( (stat -c %s $logFile)/8 ))
+    size=$(( (`stat -c %s $logFile`)/8 ))
     if [[ $size -gt $logMaxSize ]]; then
       mv $logFile "$logFile.old"
       touch "$logFile"
@@ -41,14 +45,33 @@ function setup()
   fi
 }
 
-function stop()
+function start()
 {
-  # Stop flextrace
-  if [[ `check_daemon` -eq 0 ]]; then
-    echo " * \033[31;5;148mError\033[39m: $daemonName is not running"
+  setup
+  check_daemon
+  local daemon_status=$?
+  if [[ $daemon_status -eq 1 ]]; then
+    printf $REDCOLOR "$daemonName is already running."
     exit 1
   fi
-  echo " * Stopping $daemonName"
+  printf $GREENCOLOR " * Starting $daemonName with PID: $myPid."
+  echo "$myPid" > "$pidFile"
+  log '*** ' $(date +"%Y-%m-%d") ": Staring up $daemonName"
+
+  # Start loop
+  loop
+}
+
+function stop()
+{
+  check_daemon
+  local daemon_status=$?
+  # Stop flextrace
+  if [[ $daemon_status -eq 0 ]]; then
+    printf $REDCOLOR "$daemonName is not running"
+    exit 1
+  fi
+  printf $PURPLECOLOR " * Stopping $daemonName"
   log '*** ' $(date +"%Y-%m-%d") ": $daemonName stopped."
 
   if [[ ! -z $(cat $pidFile) ]]; then
@@ -58,17 +81,21 @@ function stop()
 
 function status()
 {
-  if [[ $(check_daemon) -eq 1 ]]; then
-    echo " * $daemonName is running."
+  check_daemon
+  local daemon_status=$?
+  if [[ $daemon_status -eq 1 ]]; then
+    printf $GREENCOLOR " * $daemonName is running."
   else
-    echo " * $daemonName is not running."
+    printf $REDCOLOR " * $daemonName is not running."
   fi
   exit 0
 }
 
 function restart()
 {
-  if [[ $(check_daemon) = 0 ]]; then
+  check_daemon
+  local daemon_status=$?
+  if [[ $daemon_status = 0 ]]; then
     echo "$daemonName is not running"
     exit 1
   fi
@@ -106,7 +133,7 @@ function loop()
     last=$(date +%s)
   fi
 
-  doCommands
+  trace_application
   last=$(date +%s)
   if [[ ! $((now-last+runInterval+1)) -lt $((runInterval)) ]]; then
     sleep $((now-last+runInterval))
@@ -114,6 +141,11 @@ function loop()
 
   # Startover
   loop
+}
+
+log()
+{
+  echo "$@" >> "$logFile"
 }
 
 # Command
@@ -135,7 +167,7 @@ case "$1" in
     restart
     ;;
   *)
-  echo "\033[31;5;148mError\033[39m: usage $0 { start | stop | restart | status }"
+  printf $REDCOLOR "usage $0 { start | stop | restart | status }"
   exit 1
 esac
 
