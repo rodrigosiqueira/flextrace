@@ -1,2 +1,3 @@
-flextrace.log
-flextrace.pid
+*.log
+*.pid
+*.old
