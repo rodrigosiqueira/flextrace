@@ -19,3 +19,6 @@ runInterval=1 # In seconds
 
 # Script PID
 myPid=$$
+
+# Track file
+track='.track'

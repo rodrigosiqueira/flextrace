@@ -11,6 +11,10 @@ function setup()
   fi
 
   # Check files
+  if [ ! -f "$track" ]; then
+    touch "$track"
+    echo 0 > $track
+  fi
   if [ ! -f "$logFile" ]; then
     touch "$logFile"
   else
@@ -56,6 +60,7 @@ function stop()
   if [[ ! -z $(cat $pidFile) ]]; then
     kill -9 $(cat $pidFile) &> /dev/null
     echo '' > $pidFile
+    echo 0 > $track
   fi
 }
 
@@ -76,7 +81,7 @@ function restart()
   check_daemon
   local daemon_status=$?
   if [[ $daemon_status = 0 ]]; then
-    printf $REDCOLOR "$daemonName is not running"
+    complain "$daemonName is not running"
     exit 1
   fi
   stop

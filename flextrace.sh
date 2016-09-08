@@ -20,6 +20,9 @@ function loop()
     last=$(date +%s)
   fi
 
+  if [[ $(cat $track) -gt 0 ]]; then
+    say "IT'S ME, MARIO"
+  fi
   trace_application
   last=$(date +%s)
   if [[ ! $((now-last+runInterval+1)) -lt $((runInterval)) ]]; then
@@ -28,6 +31,16 @@ function loop()
 
   # Startover
   loop
+}
+
+function enable_module()
+{
+  echo 1 > $track
+}
+
+function disable_module()
+{
+  echo 0 > $track
 }
 
 # Command
@@ -49,10 +62,10 @@ case "$1" in
     restart
     ;;
   execute-module)
-    say 'moduleeee'
+    enable_module
     ;;
   stop-module)
-    say 'stoppp'
+    disable_module
     ;;
   *)
   complain "usage $0 { start | stop | restart | status }"
