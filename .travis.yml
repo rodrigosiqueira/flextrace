@@ -1,0 +1,20 @@
+addons:
+  apt:
+    packages:
+    - collectl
+    - shunit2
+
+before_scrpit:
+  - git clone https://github.com/rodrigosiqueira/flextrace.git
+  - cd flextrace
+script:
+  - ./run_tests.sh
+
+notifications:
+  email:
+    - rodrigosiqueiramelo@gmail.com
+  on_success: change
+  on_failure: always
+branches:
+  only:
+- master
