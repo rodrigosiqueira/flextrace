@@ -5,12 +5,7 @@ base_directory="$(dirname "$0")"
 . $base_directory/utils/data_type.sh --source-only
 . $base_directory/utils/log.sh --source-only
 . $base_directory/daemon_control/main_control.sh --source-only
-
-function trace_application()
-{
-  # This is where you put all the commands for the daemon
-  echo 'Running commands'
-}
+. $base_directory/modules/resource_track.sh --source-only
 
 function loop()
 {
@@ -21,12 +16,7 @@ function loop()
   fi
 
   if [[ $(cat $track) -gt 0 ]]; then
-    say "IT'S ME, MARIO"
-  fi
-  trace_application
-  last=$(date +%s)
-  if [[ ! $((now-last+runInterval+1)) -lt $((runInterval)) ]]; then
-    sleep $((now-last+runInterval))
+    collect_resource_data '/tmp' cpu
   fi
 
   # Startover
@@ -61,14 +51,15 @@ case "$1" in
   restart)
     restart
     ;;
-  execute-module)
+  run-module)
     enable_module
     ;;
   stop-module)
     disable_module
     ;;
   *)
-  complain "usage $0 { start | stop | restart | status }"
+  complain "usage $0 { start | stop | restart | status |" \
+           "run-module | stop-module }"
   exit 1
 esac
 
