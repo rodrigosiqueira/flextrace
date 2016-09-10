@@ -1,20 +1,22 @@
-addons:
-  apt:
-    packages:
-    - collectl
-    - shunit2
+language: bash
 
-before_scrpit:
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y collectl shunit2
+before_script:
   - git clone https://github.com/rodrigosiqueira/flextrace.git
   - cd flextrace
 script:
   - ./run_tests.sh
-
 notifications:
   email:
-    - rodrigosiqueiramelo@gmail.com
-  on_success: change
-  on_failure: always
+    recipients:
+      - rodrigosiqueiramelo@gmail.com
+    on_success: change
+    on_failure: always
+
+# safelist
 branches:
   only:
-- master
+  - master
+  - stable
