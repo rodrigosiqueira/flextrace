@@ -10,11 +10,7 @@ function setup()
     mkdir "$logDir"
   fi
 
-  # Check files
-  if [ ! -f "$track" ]; then
-    touch "$track"
-    echo 0 > $track
-  fi
+  # Verify if log file exists, if already exists check the size
   if [ ! -f "$logFile" ]; then
     touch "$logFile"
   else

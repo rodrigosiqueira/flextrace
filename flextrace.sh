@@ -51,15 +51,15 @@ case "$1" in
   restart)
     restart
     ;;
-  run-module)
-    enable_module
+  capture)
+    capture
     ;;
-  stop-module)
-    disable_module
+  release)
+    release
     ;;
   *)
   complain "usage $0 { start | stop | restart | status |" \
-           "run-module | stop-module }"
+           "run-module | stop-module | capture | release }"
   exit 1
 esac
 
