@@ -1,6 +1,8 @@
 #!/bin/bash
 
 base_directory="$(dirname "$0")"
+continuous_pid=0
+
 . $base_directory/utils/messages.sh --source-only
 . $base_directory/utils/data_type.sh --source-only
 . $base_directory/utils/log.sh --source-only
@@ -15,22 +17,26 @@ function loop()
     last=$(date +%s)
   fi
 
-  if [[ $(cat $track) -gt 0 ]]; then
-    collect_resource_data '/tmp' cpu
-  fi
-
   # Startover
   loop
 }
 
-function enable_module()
+function capture()
 {
-  echo 1 > $track
+  # TODO: You should read this value in the configuration file
+  continuous_collect_data '/tmp/collect_xpto' cpu continuous_pid
+  echo $continuous_pid > '.continuous'
+  say "Start collect"
 }
 
-function disable_module()
+function release()
 {
-  echo 0 > $track
+  if [[ $(cat .continuous) -gt 0 ]]; then
+    say 'Stopped continuous collect'
+    continuous_pid=$(cat .continuous)
+    echo $continuous_pid
+    kill -SIGTERM $continuous_pid
+  fi
 }
 
 # Command

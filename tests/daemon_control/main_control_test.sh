@@ -29,4 +29,14 @@ function testSetupCheckDirectory()
   assertEquals 'Directory should not exists' $? 0
 }
 
+function testSetupCheckFiles()
+{
+  test ! -f $logFile
+  assertEquals 'File log file not exist yet' $? 0
+
+  setup
+  test ! -f $logFile
+  assertEquals 'Log file not exists' $? 1
+}
+
 . shunit2

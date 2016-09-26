@@ -54,9 +54,8 @@ function stop()
   log '*** ' $(date +"%Y-%m-%d") ": $daemonName stopped."
 
   if [[ ! -z $(cat $pidFile) ]]; then
-    kill -9 $(cat $pidFile) &> /dev/null
+    kill -SIGTERM $(cat $pidFile) &> /dev/null
     echo '' > $pidFile
-    echo 0 > $track
   fi
 }
 
