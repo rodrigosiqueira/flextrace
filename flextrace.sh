@@ -9,6 +9,16 @@ continuous_pid=0
 . $base_directory/daemon_control/main_control.sh --source-only
 . $base_directory/modules/resource_track.sh --source-only
 
+function help_commands()
+{
+  say "s - start Flextrace"
+  say "p - pause Flextrace"
+  say "a - status of Flextrace"
+  say "r - restart Flextrace"
+  say "c - start collect based on file configuration"
+  say "f - stop collect"
+}
+
 function loop()
 {
   now=$(date +%s)
@@ -44,29 +54,36 @@ if [ -f "$pidFile" ]; then
   oldPid=$(cat $pidFile)
 fi
 check_daemon
-case "$1" in
-  start)
-    start
+
+getopts "sparcfh" opt
+
+case "$opt" in
+  s)
+    start >&2
     ;;
-  stop)
-    stop
+  p)
+    stop >&2
     ;;
-  status)
-    status
+  a)
+    status >&2
     ;;
-  restart)
-    restart
+  r)
+    restart >&2
     ;;
-  capture)
-    capture
+  c)
+    capture >&2
     ;;
-  release)
-    release
+  f)
+    release >&2
     ;;
-  *)
-  complain "usage $0 { start | stop | restart | status |" \
-           "run-module | stop-module | capture | release }"
-  exit 1
+  h)
+    help_commands >&2
+    ;;
+  \?)
+    complain "Invalid option: -$OPTARG" >&2
+    complain "usage $0 [sparcfh]"
+    exit 1
+    ;;
 esac
 
 exit 0
