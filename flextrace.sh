@@ -2,10 +2,12 @@
 
 base_directory="$(dirname "$0")"
 continuous_pid=0
+config_path='config/flextrace.conf'
 
 . $base_directory/utils/messages.sh --source-only
 . $base_directory/utils/data_type.sh --source-only
 . $base_directory/utils/log.sh --source-only
+. $base_directory/utils/handle_configuration_file.sh --source-only
 . $base_directory/daemon_control/main_control.sh --source-only
 . $base_directory/modules/resource_track.sh --source-only
 
@@ -33,10 +35,11 @@ function loop()
 
 function capture()
 {
-  # TODO: You should read this value in the configuration file
-  continuous_collect_data '/tmp/collect_xpto' cpu continuous_pid
+  check_configuration $config_path
+  local output_result=${configurations[folder_save_to]}
+  continuous_collect_data $output_result cpu continuous_pid
   echo $continuous_pid > '.continuous'
-  say "Start collect"
+  say 'Start collect'
 }
 
 function release()
@@ -56,6 +59,8 @@ fi
 check_daemon
 
 getopts "sparcfh" opt
+
+check_configuration $config_path
 
 case "$opt" in
   s)

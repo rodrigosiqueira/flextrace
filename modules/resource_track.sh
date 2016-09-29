@@ -37,25 +37,25 @@ function continuous_collect_data()
   local continuous_collect=$2
   declare -n collectlPid=$3
 
-  case $continuous_collect in
-    memory)
-      # Node Total Used Free Slab Mapped Anon AnonH Locked Inact HitPct
-      to_collect='-sM'
-    ;;
-    cpu)
-      # Cpu User Nice Sys Wait IRQ Soft Steal Guest NiceG Idle
-      to_collectl='-sC'
-    ;;
-    disk)
-      # Name KBytes Merged IOs Size Wait KBytes Merged IOs Size Wait RWSize
-      # QLen Wait SvcTim Util
-      to_collectl='-sD'
-    ;;
-    *)
-      to_collectl='-sC'
-    ;;
-  esac
+  local to_collect='C'
+  build_flag to_collect
 
-  collectl $to_collect -f $save_to &
+  collectl '-s'$to_collect -f $save_to &
   collectlPid=$!
+}
+
+function build_flag()
+{
+  declare -n flag=$1
+  check_configuration $config_path
+
+  if ${configurations[follow_cpu]}; then
+    flag='C'
+  fi
+  if ${configurations[follow_memory]}; then
+    flag=$flag'M'
+  fi
+  if ${configurations[follow_disk]}; then
+    flag=$flag'D'
+  fi
 }
