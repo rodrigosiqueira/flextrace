@@ -1,25 +1,23 @@
 #!/bin/bash
 
-base_directory="$(dirname "$0")"
-continuous_pid=0
+# Copyright (C) 2016 Rodrigo Siqueira
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
+#
+# This file put all scripts together and keep option menu. Finally it has a
+# basic manipulation of sample collect
+
+BASE_DIRECTORY="$(dirname "$0")"
 config_path='config/flextrace.conf'
 
-. $base_directory/utils/messages.sh --source-only
-. $base_directory/utils/data_type.sh --source-only
-. $base_directory/utils/log.sh --source-only
-. $base_directory/utils/handle_configuration_file.sh --source-only
-. $base_directory/daemon_control/main_control.sh --source-only
-. $base_directory/modules/resource_track.sh --source-only
-
-function help_commands()
-{
-  say "s - start Flextrace"
-  say "p - pause Flextrace"
-  say "a - status of Flextrace"
-  say "r - restart Flextrace"
-  say "c - start collect based on file configuration"
-  say "f - stop collect"
-}
+. $BASE_DIRECTORY/utils/messages.sh --source-only
+. $BASE_DIRECTORY/utils/data_type.sh --source-only
+. $BASE_DIRECTORY/utils/log.sh --source-only
+. $BASE_DIRECTORY/utils/handle_configuration_file.sh --source-only
+. $BASE_DIRECTORY/daemon_control/main_control.sh --source-only
+. $BASE_DIRECTORY/daemon_control/collect_continuous_handler.sh --source-only
+. $BASE_DIRECTORY/modules/resource_track.sh --source-only
 
 function loop()
 {
@@ -31,25 +29,6 @@ function loop()
 
   # Startover
   loop
-}
-
-function capture()
-{
-  check_configuration $config_path
-  local output_result=${configurations[folder_save_to]}
-  continuous_collect_data $output_result cpu continuous_pid
-  echo $continuous_pid > '.continuous'
-  say 'Start collect'
-}
-
-function release()
-{
-  if [[ $(cat .continuous) -gt 0 ]]; then
-    say 'Stopped continuous collect'
-    continuous_pid=$(cat .continuous)
-    echo $continuous_pid
-    kill -SIGTERM $continuous_pid
-  fi
 }
 
 # Command

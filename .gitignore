@@ -1,5 +1,6 @@
 *.log
 *.pid
 *.old
+*.gz
 .track
 .continuous

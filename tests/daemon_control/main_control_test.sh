@@ -6,10 +6,9 @@ declare -r target_output='tests/temp_files'
 setUp()
 {
   mkdir -p $target_output
-  daemonName='FlexTrace'
   logDir=$target_output
   pidDir=$target_output
-  logFile="$logDir/$daemonName.log"
+  logFile="$logDir/$DAEMONNAME.log"
 }
 
 tearDown()

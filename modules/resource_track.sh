@@ -1,7 +1,12 @@
+# Copyright (C) 2016 Rodrigo Siqueira
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
+
 # Constants
-declare -r memory_log='memory.log'
-declare -r cpu_log='cpu.log'
-declare -r hardisk_log='hardisk.log'
+declare -r MEMORY_LOG='memory.log'
+declare -r CPU_LOG='cpu.log'
+declare -r HARDISK_LOG='hardisk.log'
 
 # Handling collectl base on the configuration file
 function collect_resource_data()
@@ -13,29 +18,31 @@ function collect_resource_data()
   case $track_target in
     memory)
       # Node Total Used Free Slab Mapped Anon AnonH Locked Inact HitPct
-      collectl -c2 -sM | tail -n 1 >> $save_to/$memory_log
+      collectl -c2 -sM | tail -n 1 >> $save_to/$MEMORY_LOG
     ;;
     cpu)
       # Cpu User Nice Sys Wait IRQ Soft Steal Guest NiceG Idle
-      collectl -c2 -sC | tail -n 1 >> $save_to/$cpu_log
+      collectl -c2 -sC | tail -n 1 >> $save_to/$CPU_LOG
     ;;
     disk)
       # Name KBytes Merged IOs Size Wait KBytes Merged IOs Size Wait RWSize
       # QLen Wait SvcTim Util
-      collectl -c2 -sD | tail -n 1 >> $save_to/$hardisk_log
+      collectl -c2 -sD | tail -n 1 >> $save_to/$HARDISK_LOG
     ;;
     *)
-      collectl -c2 -sM | tail -n 1 >> $save_to/$memory_log
-      collectl -c2 -sC | tail -n 1 >> $save_to/$cpu_log
+      collectl -c2 -sM | tail -n 1 >> $save_to/$MEMORY_LOG
+      collectl -c2 -sC | tail -n 1 >> $save_to/$CPU_LOG
     ;;
   esac
 }
 
+# Handling the continuous capture of data from hardware
+# @param save_to Path to save all the results
+# @param collectlPid Reference to PID
 function continuous_collect_data()
 {
   local save_to=$1
-  local continuous_collect=$2
-  declare -n collectlPid=$3
+  declare -n collectlPid=$2
 
   local to_collect='C'
   build_flag to_collect
@@ -44,6 +51,8 @@ function continuous_collect_data()
   collectlPid=$!
 }
 
+# Build flag for collectl based on configuration file
+# @param flag Keep the current trace requested
 function build_flag()
 {
   declare -n flag=$1

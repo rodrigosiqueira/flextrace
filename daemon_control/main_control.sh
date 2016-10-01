@@ -1,3 +1,8 @@
+# Copyright (C) 2016 Rodrigo Siqueira
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
+
 # Set up basic folder to work daemon. Basically, it creates: pid and log
 # folder, and log file.
 function setup()
@@ -29,13 +34,13 @@ function start()
   check_daemon
   local daemon_status=$?
   if [[ $daemon_status -eq 1 ]]; then
-    complain "$daemonName is already running."
+    complain "$DAEMONNAME is already running."
     exit 1
   fi
 
-  say " * Starting $daemonName with PID: $myPid."
+  say " * Starting $DAEMONNAME with PID: $myPid."
   echo "$myPid" > "$pidFile"
-  log '*** ' $(date +"%Y-%m-%d") ": Staring up $daemonName"
+  log '*** ' $(date +"%Y-%m-%d") ": Staring up $DAEMONNAME"
 
   # Start loop
   loop
@@ -47,11 +52,11 @@ function stop()
   local daemon_status=$?
   # Stop flextrace
   if [[ $daemon_status -eq 0 ]]; then
-    complain "$daemonName is not running"
+    complain "$DAEMONNAME is not running"
     exit 1
   fi
-  printf $PURPLECOLOR " * Stopping $daemonName"
-  log '*** ' $(date +"%Y-%m-%d") ": $daemonName stopped."
+  printf $PURPLECOLOR " * Stopping $DAEMONNAME"
+  log '*** ' $(date +"%Y-%m-%d") ": $DAEMONNAME stopped."
 
   if [[ ! -z $(cat $pidFile) ]]; then
     kill -SIGTERM $(cat $pidFile) &> /dev/null
@@ -64,9 +69,9 @@ function status()
   check_daemon
   local daemon_status=$?
   if [[ $daemon_status -eq 1 ]]; then
-    say " * $daemonName is running."
+    say " * $DAEMONNAME is running."
   else
-    complain " * $daemonName is not running."
+    complain " * $DAEMONNAME is not running."
   fi
   exit 0
 }
@@ -76,7 +81,7 @@ function restart()
   check_daemon
   local daemon_status=$?
   if [[ $daemon_status = 0 ]]; then
-    complain "$daemonName is not running"
+    complain "$DAEMONNAME is not running"
     exit 1
   fi
   stop
@@ -95,8 +100,8 @@ function check_daemon()
         return 0
       fi
     fi
-  elif [[ $(ps aux | grep "$daemonName" | grep -v grep | grep -v "$myPid" | grep -v "00:00.0") > /dev/null ]]; then
-    log '***' $(date +"%Y-%m-%d") ": $daemonName running with invalid PID; restarting."
+  elif [[ $(ps aux | grep "$DAEMONNAME" | grep -v grep | grep -v "$myPid" | grep -v "00:00.0") > /dev/null ]]; then
+    log '***' $(date +"%Y-%m-%d") ": $DAEMONNAME running with invalid PID; restarting."
     restart
     return 1
   else
