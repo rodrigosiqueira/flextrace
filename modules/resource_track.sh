@@ -47,7 +47,7 @@ function continuous_collect_data()
   local to_collect='C'
   build_flag to_collect
 
-  collectl '-s'$to_collect -f $save_to &
+  collectl '-s'$to_collect -P -f $save_to &
   collectlPid=$!
 }
 

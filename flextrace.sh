@@ -19,6 +19,9 @@ config_path='config/flextrace.conf'
 . $BASE_DIRECTORY/daemon_control/collect_continuous_handler.sh --source-only
 . $BASE_DIRECTORY/modules/resource_track.sh --source-only
 
+# Handling signals
+trap "say 'Just a second...' && stop" SIGINT SIGTERM
+
 function loop()
 {
   now=$(date +%s)

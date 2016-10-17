@@ -50,11 +50,13 @@ function stop()
 {
   check_daemon
   local daemon_status=$?
+
   # Stop flextrace
   if [[ $daemon_status -eq 0 ]]; then
     complain "$DAEMONNAME is not running"
     exit 1
   fi
+
   printf $PURPLECOLOR " * Stopping $DAEMONNAME"
   log '*** ' $(date +"%Y-%m-%d") ": $DAEMONNAME stopped."
 
