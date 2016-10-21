@@ -9,7 +9,7 @@
 # basic manipulation of sample collect
 
 BASE_DIRECTORY="$(dirname "$0")"
-config_path='config/flextrace.conf'
+config_path="$BASE_DIRECTORY/config/flextrace.conf"
 
 . $BASE_DIRECTORY/utils/messages.sh --source-only
 . $BASE_DIRECTORY/utils/data_type.sh --source-only
